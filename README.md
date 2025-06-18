@@ -1,4 +1,4 @@
-# 🧠 AI Avatar Video Generator (CLI)
+# 🧠 LifeLike
 
 A Python-based command-line tool to generate AI-powered videos using synthetic avatars, static or animated backgrounds, and text/audio scripts — with zero dependency on real human input.
 
