@@ -1,7 +1,7 @@
 import click
 import os
 import subprocess
-from diffusers import StableDiffusionPipeline
+from diffusers import StableDiffusionPipeline, StableDiffusionXLPipeline
 import torch
 
 print(torch.cuda.is_available())
@@ -27,12 +27,19 @@ DREAMBOOTH_SCRIPT = os.path.abspath(
 
 def get_pipe(model_path=None):
     if model_path is None:
-        model_path = "runwayml/stable-diffusion-v1-5"
-    pipe = StableDiffusionPipeline.from_pretrained(
-        model_path,
-        torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-        safety_checker=None,
-    )
+        model_path = "stabilityai/stable-diffusion-xl-base-1.0"
+    if "xl" in model_path or "sdxl" in model_path:
+        pipe = StableDiffusionXLPipeline.from_pretrained(
+            model_path,
+            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+            safety_checker=None,
+        )
+    else:
+        pipe = StableDiffusionPipeline.from_pretrained(
+            model_path,
+            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+            safety_checker=None,
+        )
     pipe = pipe.to("cuda" if torch.cuda.is_available() else "cpu")
     return pipe
 
@@ -163,6 +170,53 @@ def generate_variations(person_id, count):
         click.echo(
             f"Saved high-quality variation {i+1} for '{person_id}' at {out_path}"
         )
+
+
+@cli.command(name="generate-image")
+@click.argument("prompt", required=False)
+@click.option(
+    "--prompt-file",
+    type=click.Path(exists=True),
+    help="Path to a file with one prompt per line for batch generation.",
+)
+def generate_image(prompt, prompt_file):
+    """
+    Generate an AI image from a prompt or a batch of prompts (one per line in a file).
+    If using a prompt file, each output will be named by its line number.
+    """
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    pipe = get_pipe()
+    if prompt_file:
+        with open(prompt_file, "r", encoding="utf-8") as f:
+            prompts = [line.strip() for line in f if line.strip()]
+        for idx, line_prompt in enumerate(prompts, 1):
+            generator = torch.Generator(device=pipe.device).manual_seed(
+                hash(line_prompt) % (2**32)
+            )
+            image = pipe(
+                line_prompt,
+                num_inference_steps=40,
+                guidance_scale=10.0,
+                generator=generator,
+            ).images[0]
+            out_path = os.path.join(OUTPUT_DIR, f"image_{idx:02d}.png")
+            image.save(out_path)
+            click.echo(f"Generated image for line {idx}: '{line_prompt}' at {out_path}")
+    elif prompt:
+        generator = torch.Generator(device=pipe.device).manual_seed(
+            hash(prompt) % (2**32)
+        )
+        image = pipe(
+            prompt,
+            num_inference_steps=40,
+            guidance_scale=10.0,
+            generator=generator,
+        ).images[0]
+        out_path = os.path.join(OUTPUT_DIR, "image_01.png")
+        image.save(out_path)
+        click.echo(f"Generated image for prompt '{prompt}' at {out_path}")
+    else:
+        click.echo("Please provide a prompt or a --prompt-file")
 
 
 @cli.command()
