@@ -21,6 +21,63 @@ This project is designed to serve as the backend core for a future platform or v
 
 ---
 
+## 🚀 Quick Start: Clone to Running the CLI
+
+### 1. Clone the Repository (with Submodules)
+```bash
+git clone --recurse-submodules <your-repo-url> lifelike
+cd lifelike
+```
+If you already cloned without submodules:
+```bash
+git submodule update --init --recursive
+```
+
+### 2. Create and Activate a Virtual Environment
+```bash
+python -m venv .venv
+.venv\Scripts\activate  # On Windows
+# Or
+source .venv/bin/activate  # On Linux/macOS
+```
+
+### 3. Install All Requirements (including local diffusers)
+```bash
+pip install -r requirements.txt
+```
+
+### 4. (Optional) Configure Accelerate for GPU
+```bash
+accelerate config
+```
+- Select your GPU (CUDA) device
+- Set mixed precision to `no` if using SDXL LoRA DreamBooth
+
+### 5. Prepare Your Dataset
+- Place your training images in a folder, e.g.:
+  ```
+  dataset/faces/raghu/1.png
+  dataset/faces/raghu/2.png
+  ...
+
+### 6. Run the CLI
+- **Generate a base face:**
+  ```bash
+  python lifelike/app.py generate-person raghu
+  ```
+- **Fine-tune (DreamBooth/LoRA):**
+  ```bash
+  python lifelike/app.py fine-tune-person raghu ./dataset/faces/raghu --steps 600 --prior_loss_weight 1.0
+  ```
+- **Generate variations:**
+  ```bash
+  python lifelike/app.py generate-variations raghu --count 5
+  ```
+
+---
+
+For more details, see the README sections below or run `python lifelike/app.py --help`.
+
 ## 🧱 System Design (Process Flow)
 
 ```mermaid
