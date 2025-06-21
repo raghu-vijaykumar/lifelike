@@ -86,7 +86,7 @@ import random
     "--backgrounds",
     default="plain white,gradient gray,indoor room,park,urban street,nature forest",
 )
-@click.option("--resolution", default="3840x2160")
+@click.option("--resolution", default="1080*1344")
 @click.option("--seed-base", default=12345)
 @click.option("--expression-intensity", default="mild")
 @click.option("--output-dir", default="output/generated_person")
@@ -242,7 +242,7 @@ def generate_person(
 
             image = pipe(
                 prompt=full_prompt,
-                num_inference_steps=60,
+                num_inference_steps=45,
                 guidance_scale=10.0,
                 generator=generator,
                 height=height,
