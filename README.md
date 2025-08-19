@@ -116,10 +116,48 @@ accelerate config
 ## 📝 CLI Commands
 
 - `generate-person` — Generate a diverse set of images for a new identity, with all prompt combinations and per-image metadata.
+  **Example:**
+  ```bash
+  python lifelike/app.py generate-person raghu --per-angle 3 --gender female --ethnicity indian --moods "smiling,serious" --angles "front,side" --styles "modern casual" --output-dir output/generated_person
+  ```
+
+- `generate-dreamboothset` — Generate a DreamBooth dataset with all combinations of angles, moods, and lighting for fine-tuning.
+  **Example:**
+  ```bash
+  python lifelike/app.py generate-dreamboothset raghu --gender female --ethnicity indian --age adult --moods "smiling,serious" --angles "front,side" --lighting "soft studio,cool white" --output-dir output/generated_person_dreambooth
+  ```
+
 - `fine-tune-person` — Fine-tune a model for a specific person using DreamBooth/LoRA.
+  **Example:**
+  ```bash
+  python lifelike/app.py fine-tune-person raghu ./dataset/faces/raghu --steps 600 --prior_loss_weight 1.0
+  ```
+
 - `generate-variations` — Generate multiple high-quality images for a person (uses fine-tuned model if available).
+  **Example:**
+  ```bash
+  python lifelike/app.py generate-variations raghu --count 5
+  ```
+
 - `generate-image` — Generate a single image from a prompt, or batch from a file (per-image metadata not yet implemented for batch).
+  **Example:**
+  ```bash
+  python lifelike/app.py generate-image "A photorealistic portrait of a smiling Indian woman in a saree"
+  python lifelike/app.py generate-image --prompt-file prompts.txt
+  ```
+
+- `enhance-images` — Enhance all PNG images in a folder using GFPGAN or CodeFormer.
+  **Example:**
+  ```bash
+  python lifelike/app.py enhance-images output/generated_person_dreambooth/raghu --method gfpgan
+  python lifelike/app.py enhance-images output/generated_person_dreambooth/raghu --method codeformer
+  ```
+
 - `version` — Show CLI version.
+  **Example:**
+  ```bash
+  python lifelike/app.py version
+  ```
 
 ---
 
