@@ -1,14 +1,13 @@
 import click
-import torch
 import random
 import itertools
 import json
-from PIL import Image
 from pathlib import Path
-from diffusers import StableDiffusionPipeline, StableDiffusionXLPipeline
 
 
 def get_pipe(model_path=None):
+    from diffusers import StableDiffusionPipeline, StableDiffusionXLPipeline
+
     if model_path is None:
         model_path = "stabilityai/stable-diffusion-xl-base-1.0"
     if "xl" in model_path or "sdxl" in model_path:
@@ -96,6 +95,8 @@ def generate_person(
     hair_styles,
     max_photos,
 ):
+    import torch
+
     if include_full_body and face_focus:
         click.echo(
             "⚠️ Both --include-full-body and --face-focus are set. Prioritizing full-body and disabling face focus."

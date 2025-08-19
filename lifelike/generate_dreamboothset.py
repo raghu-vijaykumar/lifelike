@@ -1,12 +1,13 @@
 import click
-import torch
 import json
 from PIL import Image
 from pathlib import Path
-from diffusers import StableDiffusionPipeline, StableDiffusionXLPipeline
 
 
 def get_pipe(model_path=None):
+    import torch
+    from diffusers import StableDiffusionPipeline, StableDiffusionXLPipeline
+
     if model_path is None:
         model_path = "stabilityai/stable-diffusion-xl-base-1.0"
     if "xl" in model_path or "sdxl" in model_path:
@@ -59,6 +60,8 @@ def generate_dreamboothset(
     output_dir,
     face_focus,
 ):
+    import torch
+
     width, height = map(int, resolution.lower().split("x"))
     person_dir = Path(output_dir) / person_id
     person_dir.mkdir(parents=True, exist_ok=True)

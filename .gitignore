@@ -1,7 +1,9 @@
-.venv/*
+.venv*/*
 dataset/output/*
 output/*
 *.pyc
 *.pyo
 __pycache__/
 dataset/faces/*
+gfpgan/*
+checkpoints/*
