@@ -99,15 +99,40 @@ def animate_image(image_path, script, voice, background, output):
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode == 0:
         click.echo(f"✅ Animation complete. Video saved in {Path(output).parent}")
+        # Find the generated video file (SadTalker usually outputs <result_dir>/<timestamp>.mp4)
+        # We'll look for the newest .mp4 file in the output directory
+        output_dir = Path(output).parent
+        mp4_files = list(output_dir.glob("*.mp4"))
+        if mp4_files:
+            generated_video = max(mp4_files, key=lambda f: f.stat().st_mtime)
+            # Mux audio using ffmpeg
+            mux_cmd = [
+                "ffmpeg",
+                "-y",
+                "-i",
+                str(generated_video),
+                "-i",
+                str(tts_output),
+                "-c:v",
+                "copy",
+                "-c:a",
+                "aac",
+                "-shortest",
+                str(output),
+            ]
+            click.echo(f"Muxing audio with ffmpeg: {' '.join(mux_cmd)}")
+            mux_result = subprocess.run(mux_cmd, capture_output=True, text=True)
+            if mux_result.returncode == 0:
+                click.echo(f"✅ Final video with audio saved to: {output}")
+            else:
+                click.echo(f"❌ ffmpeg failed: {mux_result.stderr}")
+        else:
+            click.echo("❌ No generated video found to mux audio.")
     else:
         click.echo(f"❌ SadTalker failed: {result.stderr}")
 
-    # Placeholder: Call SadTalker pipeline here
-    # Example: sad_talker_animate(image_path, script_text, voice, background, output)
     click.echo(f"Animating image: {image_path}")
     click.echo(f"Script: {script_text[:60]}{'...' if len(script_text) > 60 else ''}")
     click.echo(f"Voice: {voice}")
     click.echo(f"Background: {background}")
     click.echo(f"Output video will be saved to: {output}")
-    # TODO: Integrate SadTalker inference here
-    click.echo("✅ Animation complete (placeholder)")
